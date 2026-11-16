@@ -85,6 +85,8 @@ async function fetchHubMasterData() {
     } finally {
         showLoading(false);
     }
+    hubState.masterDoctors = parseMasterArray(data);
+    populateAddDoctorLocations();
 }
 
 /**
@@ -140,6 +142,8 @@ function getMatchScore(masterClean, excelClean) {
 }
 
 function setupEventListeners() {
+    document.getElementById('addHFType')?.addEventListener('change', populateAddDoctorLocations);
+    document.getElementById('btnAddDoctor')?.addEventListener('click', addDoctorToMaster);
     document.getElementById('generateReport')?.addEventListener('click', handleFileUpload);
     document.getElementById('sectionSelect')?.addEventListener('change', (e) => {
         hubState.section = e.target.value;
@@ -730,4 +734,130 @@ function updateDashboardSummary(uploadedList, masterDoctors) {
             </div>
         </div>
     `;
+}
+
+
+/* =====================================
+   ADD DOCTOR TO MASTER GOOGLE SHEET
+===================================== */
+
+// Populate Block / Hospital Dropdown
+function populateAddDoctorLocations() {
+    const type = document.getElementById('addHFType').value;
+    const locationSelect = document.getElementById('addLocationName');
+
+    locationSelect.innerHTML =
+        '<option value="">Select Block / Hospital</option>';
+
+    if (!type) return;
+
+    const locations = [
+        ...new Set(
+            hubState.masterDoctors
+                .filter(d =>
+                    d.hfType.trim().toLowerCase() === type.toLowerCase()
+                )
+                .map(d => d.locationName.trim())
+                .filter(Boolean)
+        )
+    ].sort();
+
+    locations.forEach(location => {
+        const option = document.createElement('option');
+        option.value = location;
+        option.textContent = location;
+        locationSelect.appendChild(option);
+    });
+}
+
+
+// Add Doctor Function
+async function addDoctorToMaster() {
+
+    const type = document.getElementById('addHFType').value;
+    const location = document.getElementById('addLocationName').value.trim();
+    const doctor = document.getElementById('addDoctorName').value.trim();
+    const message = document.getElementById('addDoctorMessage');
+    const button = document.getElementById('btnAddDoctor');
+
+    message.innerHTML = '';
+
+    if (!type || !location || !doctor) {
+        message.innerHTML =
+            '<div class="alert alert-warning py-2 mb-0">Please select HF Type, Location and enter Doctor Name.</div>';
+        return;
+    }
+
+    const cleanName = normalizeDoctorName(doctor);
+
+    // Duplicate Check
+    const duplicate = hubState.masterDoctors.some(d =>
+        d.hfType.trim().toLowerCase() === type.toLowerCase() &&
+        d.locationName.trim().toLowerCase() === location.toLowerCase() &&
+        d.cleanDocName === cleanName
+    );
+
+    if (duplicate) {
+        message.innerHTML =
+            '<div class="alert alert-warning py-2 mb-0">This Doctor already exists in Master Sheet.</div>';
+        return;
+    }
+
+    if (!confirm(`Add ${doctor} to ${location} (${type})?`)) return;
+
+    button.disabled = true;
+    button.innerHTML =
+        '<span class="spinner-border spinner-border-sm me-1"></span> Saving...';
+
+    try {
+
+        const response = await fetch(CONFIG.HUB_MASTER_URL, {
+            method: 'POST',
+            redirect: 'follow',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify({
+                action: 'addDoctor',
+                hfType: type,
+                locationName: location,
+                doctorName: doctor
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Server request failed');
+        }
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.message || 'Unable to save Doctor');
+        }
+
+        message.innerHTML =
+            '<div class="alert alert-success py-2 mb-0"><i class="fa-solid fa-check-circle me-1"></i>' +
+            escapeHtml(result.message) + '</div>';
+
+        document.getElementById('addDoctorName').value = '';
+
+        // Refresh Master Data
+        await fetchHubMasterData();
+
+    } catch (error) {
+
+        console.error('Add Doctor Error:', error);
+
+        message.innerHTML =
+            '<div class="alert alert-danger py-2 mb-0">' +
+            'Unable to save Doctor. Please check the Apps Script deployment and connection. ' +
+            escapeHtml(error.message) +
+            '</div>';
+
+    } finally {
+
+        button.disabled = false;
+        button.innerHTML =
+            '<i class="fa-solid fa-plus me-1"></i> Add Doctor';
+    }
 }
