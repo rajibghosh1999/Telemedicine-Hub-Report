@@ -193,3 +193,60 @@ body {
 }
 
 
+/* Add Doctor Section */
+#addDoctorCard {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#addDoctorCard .card-header {
+    background-color: #198754 !important;
+    padding: 12px 16px;
+}
+
+#addDoctorCard .form-label {
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+#addDoctorCard .form-control,
+#addDoctorCard .form-select {
+    min-height: 38px;
+    border-color: #adb5bd;
+}
+
+#addDoctorMessage {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+
+/* Add Doctor Card - Display Alignment Fix */
+
+#addDoctorCard {
+    width: calc(100% - 24px) !important;
+    max-width: 100% !important;
+    margin: 20px auto 24px auto !important;
+    border: 1px solid #198754 !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+    overflow: hidden;
+}
+
+/* Card Body Spacing */
+#addDoctorCard .card-body {
+    padding: 18px 20px !important;
+}
+
+/* Mobile Display */
+@media (max-width: 576px) {
+    #addDoctorCard {
+        width: 100% !important;
+        margin: 15px auto !important;
+    }
+
+    #addDoctorCard .card-body {
+        padding: 12px !important;
+    }
+}
