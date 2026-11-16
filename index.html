@@ -65,6 +65,7 @@
     </div>
 </div>
 
+
     <!-- বাটনের অংশ -->
     <div class="card-body bg-light border-bottom border-dark text-center no-print d-flex flex-wrap justify-content-center gap-2 py-2">
         <button id="btnExportExcel" class="btn btn-success btn-sm fw-bold"><i class="fa-solid fa-file-excel me-1"></i> Download Excel</button>
@@ -99,6 +100,59 @@
                 </tbody>
             </table>
         </div>
+    </div>
+</div>
+
+<!-- ADD DOCTOR SECTION -->
+<div class="card border-success shadow-sm mt-3 no-print" id="addDoctorCard">
+    <div class="card-header bg-success text-white fw-bold">
+        <i class="fa-solid fa-user-plus me-2"></i>
+        Add New Doctor to Master Sheet
+    </div>
+
+    <div class="card-body">
+        <div class="row g-3 align-items-end">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label fw-bold">HF Type</label>
+                <select id="addHFType" class="form-select">
+                    <option value="">Select HF Type</option>
+                    <option value="Block">Block</option>
+                    <option value="Hospital">Hospital</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-bold">
+                    Block / Hospital Name
+                </label>
+                <select id="addLocationName" class="form-select">
+                    <option value="">Select Block / Hospital</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label fw-bold">
+                    Enter Doctor Name
+                </label>
+                <input type="text"
+                       id="addDoctorName"
+                       class="form-control"
+                       placeholder="Enter Doctor Name">
+            </div>
+
+            <div class="col-12 col-md-2 d-grid">
+                <button type="button"
+                        id="btnAddDoctor"
+                        class="btn btn-success fw-bold">
+                    <i class="fa-solid fa-plus me-1"></i>
+                    Add Doctor
+                </button>
+            </div>
+
+        </div>
+
+        <div id="addDoctorMessage" class="mt-3"></div>
     </div>
 </div>
 
